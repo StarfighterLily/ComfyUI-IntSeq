@@ -37,11 +37,11 @@ class IntSeqImage:
                 "blue_min": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
                 "blue_max": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
                 "angle_scale": ( "FLOAT", { "default": 1.0, "min": -360.0, "max": 360.0, "step": 0.1, "tooltip": "[Angle/Length] Multiplier for turn angle" } ),
-                "length_scale": ( "FLOAT", { "default": 10.0, "min": -200.0, "max": 200.0, "step": 0.1, "tooltip": "[Angle/Length] Multiplier for line length" } ),
-                "line_width": ( "INT", { "default": 1, "min": 1, "max": 100, "step": 1, "tooltip": "[Angle/Length, Meander] Width of the drawn line" } ),
-                "start_x": ( "INT", { "default": 0, "min": 0, "max": 1024, "step": 1, "tooltip": "[Angle/Length, Meander] Starting X" } ),
-                "start_y": ( "INT", { "default": 0, "min": 0, "max": 1024, "step": 1, "tooltip": "[Angle/Length, Meander] Starting Y" } ),
-                "boundary_behavior": ( [ "clamp", "wrap", "bounce", "none" ], { "default": "clamp", "tooltip": "[Angle/Length, Meander] How to handle the drawing point at image boundaries" } )
+                "length_scale": ( "FLOAT", { "default": 10.0, "min": -200.0, "max": 200.0, "step": 0.1, "tooltip": "[Angle/Length] Multiplier for line length [Meander] Pixel distance multiplier" } ),
+                "line_width": ( "INT", { "default": 1, "min": 1, "max": 100, "step": 1, "tooltip": "[Angle/Length, Run/Turn] Width of the drawn line" } ),
+                "start_x": ( "INT", { "default": 0, "min": 0, "max": 1024, "step": 1, "tooltip": "Starting X" } ),
+                "start_y": ( "INT", { "default": 0, "min": 0, "max": 1024, "step": 1, "tooltip": "Starting Y" } ),
+                "boundary_behavior": ( [ "clamp", "wrap", "bounce", "none" ], { "default": "clamp", "tooltip": "[Angle/Length, Run/Turn, Meander] How to handle the drawing point at image boundaries" } )
             }
         }
 
@@ -75,7 +75,7 @@ class IntSeqImage:
             outimage = Image.new( img_mode, ( width, height), 0 )
         draw = ImageDraw.Draw( outimage )
 
-        if method == "RGB" or method == "grayscale":
+        if method == "RGB" or method == "grayscale":  # implement start_x, start_y maybe
             value_index = 0
             for y in range( height ):
                 for x in range( width ):
@@ -231,7 +231,7 @@ class IntSeqSigmas:
     def INPUT_TYPES( cls ):
         return {
             "required": {
-                "values": ( "STRING", { "multiline": True, "default": "", "tooltip": "Enter a list of numbers separated by commas" } ),
+                "sequence": ( "STRING", { "multiline": True, "default": "", "tooltip": "Enter a list of numbers separated by commas" } ),
                 "count": ( "INT", { "default": 0, "min": 0, "max": 4096, "step": 1, "tooltip": "How many numbers to use from the start of the sequence (0 for all)" } ),
                 "new_minimum": ( "FLOAT", { "default": 0.0, "min": -10000.0, "max": 10000.0, "step": 0.01, "tooltip": "The new lowest value in the output range" } ),
                 "new_maximum": ( "FLOAT", { "default": 20.0, "min": -10000.0, "max": 10000.0, "step": 0.01, "tooltip": "The new highest value in the output range" } ),
