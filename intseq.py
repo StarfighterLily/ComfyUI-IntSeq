@@ -245,9 +245,9 @@ class IntSeqSigmas:
     FUNCTION = "map_sequence"
     CATEGORY = "IntSeq/sigmas"
 
-    def map_sequence( self, values, count, new_minimum, new_maximum, reverse, sort_order ):
+    def map_sequence( self, sequence, count, new_minimum, new_maximum, reverse, sort_order ):
         try:
-            value_list = [ float( x.strip() ) for x in values.split( ',' ) if x.strip() ]
+            value_list = [ float( x.strip() ) for x in sequence.split( ',' ) if x.strip() ]
         except ValueError:
             print( "Warning: [IntSeqSigmas] Could not parse all values. Please ensure it's a comma-separated list of numbers." )
             return ( torch.empty( 0 ), )
