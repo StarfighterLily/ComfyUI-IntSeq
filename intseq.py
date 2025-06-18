@@ -26,7 +26,7 @@ class IntSeqImage:
                 "width": ( "INT", { "default": 512, "min": 128, "max": 8192, "step": 8, "tooltip": "Width of the image" } ),
                 "height": ( "INT", { "default": 512, "min": 128, "max": 8192, "step": 8, "tooltip": "Height of the image" } ),
                 "sequence": ( "STRING", { "multiline": True, "default": "", "tooltip": "Enter a list of numbers separated by commas" } ),
-                "method": ( [ "RGB", "grayscale", "angle and length", "run and turn", "meander" ], { "default": "RGB" } ),
+                "method": ( [ "RGB", "angle and length", "run and turn", "meander" ], { "default": "RGB" } ),
                 "color_offset": ( "FLOAT", { "default": 0.33, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "0 - 1" } ),
                 "value_min": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
                 "value_max": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
@@ -69,28 +69,19 @@ class IntSeqImage:
         if not values:
             return ( torch.zeros( ( 1, height, width, 3 ), dtype=torch.float32 ), )
         
-        if method != "grayscale":
-            outimage = Image.new( img_mode, ( width, height ), (0,0,0) )
-        elif method == "grayscale":
-            outimage = Image.new( img_mode, ( width, height), 0 )
+        outimage = Image.new( img_mode, ( width, height ), (0,0,0) )
         draw = ImageDraw.Draw( outimage )
 
-        if method == "RGB" or method == "grayscale":  # implement start_x, start_y maybe
+        if method == "RGB":  # implement start_x, start_y maybe
             value_index = 0
             for y in range( height ):
                 for x in range( width ):
                     nv = values[ value_index % len( values ) ]
                     nv = clamp( nv, lv, mv )
-
-                    if method == "RGB":
-                        nr = int( remap( nv, lv, mv, lr, mr ) )
-                        ng = int( remap( ( nv + color_offset * ( mv - lv ) ) % ( mv - lv + 1 ) + lv, lv, mv, lg, mg ) )
-                        nb = int( remap( ( nv + 2 * color_offset * ( mv - lv ) ) % ( mv - lv + 1 ) + lv, lv, mv, lb, mb ) )
-                        outimage.putpixel( ( x, y ), ( nr, ng, nb ) )
-                    elif method == "grayscale":
-                        gray_value = int( remap( nv, lv, mv, lr, mr ) )
-                        outimage.putpixel( ( x, y ), gray_value )
-
+                    nr = int( remap( nv, lv, mv, lr, mr ) )
+                    ng = int( remap( ( nv + color_offset * ( mv - lv ) ) % ( mv - lv + 1 ) + lv, lv, mv, lg, mg ) )
+                    nb = int( remap( ( nv + 2 * color_offset * ( mv - lv ) ) % ( mv - lv + 1 ) + lv, lv, mv, lb, mb ) )
+                    outimage.putpixel( ( x, y ), ( nr, ng, nb ) )
                     value_index += 1
                     
         elif method == "meander":
