@@ -264,7 +264,7 @@ class IntSeqSigmas:
         original_maximum = max( val_subset )
 
         mapped_values = [ remap( x, original_minimum, original_maximum, new_minimum, new_maximum ) for x in val_subset ]
-        sigmas_tensor = torch.tensor( mapped_values, dtype=torch.float64, device='cpu' )
+        sigmas_tensor = torch.tensor( mapped_values, dtype=torch.float32, device='cpu' )
 
         return ( sigmas_tensor, )
 
