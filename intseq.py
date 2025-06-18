@@ -26,7 +26,7 @@ class IntSeqImage:
                 "width": ( "INT", { "default": 512, "min": 128, "max": 8192, "step": 8, "tooltip": "Width of the image" } ),
                 "height": ( "INT", { "default": 512, "min": 128, "max": 8192, "step": 8, "tooltip": "Height of the image" } ),
                 "sequence": ( "STRING", { "multiline": True, "default": "", "tooltip": "Enter a list of numbers separated by commas" } ),
-                "method": ( [ "RGB", "angle and length", "run and turn", "meander", "cellular_automaton" ], { "default": "RGB" } ),
+                "method": ( [ "RGB", "angle and length", "run and turn", "meander", "cellular automaton" ], { "default": "RGB" } ),
                 "rule": ( "INT", { "default": 30, "min": 0, "max": 255, "step": 1, "tooltip": "[Cellular Automaton] The rule to apply (0-255)" } ),
                 "color_offset": ( "FLOAT", { "default": 0.33, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "0 - 1" } ),
                 "value_min": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
@@ -51,7 +51,7 @@ class IntSeqImage:
     CATEGORY = "IntSeq/image"
 
     def generate_image( self, width, height, sequence, method, rule, color_offset, value_min, value_max, red_min, red_max, green_min, green_max, blue_min, blue_max, angle_scale, length_scale, line_width, start_x, start_y, boundary_behavior ):
-        img_mode = "RGB" if method in [ "RGB", "angle and length", "run and turn", "meander", "cellular_automaton" ] else "L"
+        img_mode = "RGB" if method in [ "RGB", "angle and length", "run and turn", "meander", "cellular automaton" ] else "L"
         
         lv = 0 if value_min == -1 else value_min
         mv = 255 if value_max == -1 else value_max
@@ -85,7 +85,7 @@ class IntSeqImage:
                     outimage.putpixel( ( x, y ), ( nr, ng, nb ) )
                     value_index += 1
 
-        elif method == "cellular_automaton":
+        elif method == "cellular automaton":
             rule_bits = format( rule, '08b' )
             
             current_row = [ 0 ] * width
