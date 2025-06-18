@@ -26,7 +26,8 @@ class IntSeqImage:
                 "width": ( "INT", { "default": 512, "min": 128, "max": 8192, "step": 8, "tooltip": "Width of the image" } ),
                 "height": ( "INT", { "default": 512, "min": 128, "max": 8192, "step": 8, "tooltip": "Height of the image" } ),
                 "sequence": ( "STRING", { "multiline": True, "default": "", "tooltip": "Enter a list of numbers separated by commas" } ),
-                "method": ( [ "RGB", "angle and length", "run and turn", "meander" ], { "default": "RGB" } ),
+                "method": ( [ "RGB", "angle and length", "run and turn", "meander", "cellular_automaton" ], { "default": "RGB" } ),
+                "rule": ( "INT", { "default": 30, "min": 0, "max": 255, "step": 1, "tooltip": "[Cellular Automaton] The rule to apply (0-255)" } ),
                 "color_offset": ( "FLOAT", { "default": 0.33, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "0 - 1" } ),
                 "value_min": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
                 "value_max": ( "INT", { "default": -1, "min": -1, "max": 255, "step": 1, "tooltip": " -1 - 255" } ),
@@ -49,8 +50,8 @@ class IntSeqImage:
     FUNCTION = "generate_image"
     CATEGORY = "IntSeq/image"
 
-    def generate_image( self, width, height, sequence, method, color_offset, value_min, value_max, red_min, red_max, green_min, green_max, blue_min, blue_max, angle_scale, length_scale, line_width, start_x, start_y, boundary_behavior ):
-        img_mode = "RGB" if method in [ "RGB", "angle and length", "run and turn", "meander" ] else "L"
+    def generate_image( self, width, height, sequence, method, rule, color_offset, value_min, value_max, red_min, red_max, green_min, green_max, blue_min, blue_max, angle_scale, length_scale, line_width, start_x, start_y, boundary_behavior ):
+        img_mode = "RGB" if method in [ "RGB", "angle and length", "run and turn", "meander", "cellular_automaton" ] else "L"
         
         lv = 0 if value_min == -1 else value_min
         mv = 255 if value_max == -1 else value_max
@@ -72,7 +73,7 @@ class IntSeqImage:
         outimage = Image.new( img_mode, ( width, height ), (0,0,0) )
         draw = ImageDraw.Draw( outimage )
 
-        if method == "RGB":  # implement start_x, start_y maybe
+        if method == "RGB":
             value_index = 0
             for y in range( height ):
                 for x in range( width ):
@@ -83,7 +84,36 @@ class IntSeqImage:
                     nb = int( remap( ( nv + 2 * color_offset * ( mv - lv ) ) % ( mv - lv + 1 ) + lv, lv, mv, lb, mb ) )
                     outimage.putpixel( ( x, y ), ( nr, ng, nb ) )
                     value_index += 1
+
+        elif method == "cellular_automaton":
+            rule_bits = format( rule, '08b' )
+            
+            current_row = [ 0 ] * width
+            for i in range( width ):
+                val = values[ i % len( values ) ]
+                current_row[ i ] = int( remap( val, min( values ), max( values ), 0, 1.99 ) ) % 2
+
+            color0 = ( lr, lg, lb )
+            color1 = ( mr, mg, mb )
+
+            for y in range( height ):
+                next_row = [ 0 ] * width
+                for x in range( width ):
+                    state = current_row[ x ]
+                    color = color1 if state == 1 else color0
+                    outimage.putpixel( ( x, y ), color )
                     
+                    if y < height - 1:
+                        left = current_row[ ( x - 1 + width ) % width ]
+                        center = current_row[ x ]
+                        right = current_row[ ( x + 1 ) % width ]
+                        
+                        pattern_index = 7 - ( left * 4 + center * 2 + right )
+                        new_state = int( rule_bits[ pattern_index ] )
+                        next_row[ x ] = new_state
+                
+                current_row = next_row
+
         elif method == "meander":
             current_x = start_x
             current_y = start_y
