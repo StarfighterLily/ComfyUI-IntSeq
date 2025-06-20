@@ -420,12 +420,37 @@ class IntSeqWave:
 
 
         return ( ",".join( map( str, values ) ), )
+        
+class SigmasToIntSeq:
+    @classmethod
+    def INPUT_TYPES( cls ):
+        return {
+            "required": {
+                "sigmas": ( "SIGMAS", ),
+            }
+        }
+
+    RETURN_TYPES = ( "STRING", )
+    RETURN_NAMES = ( "SEQUENCE", )
+    FUNCTION = "convert_to_sequence"
+    CATEGORY = "IntSeq/sigmas"
+
+    def convert_to_sequence( self, sigmas ):
+        if sigmas is None:
+            return ( "", )
+        
+        sequence_list = sigmas.cpu().numpy().tolist()
+        
+        sequence_str = ", ".join( map( str, sequence_list ) )
+        
+        return ( sequence_str, )
 
 # --- Node Mappings ---
 
 NODE_CLASS_MAPPINGS = {
     "IntSeqImage": IntSeqImage,
     "IntSeqSigmas": IntSeqSigmas,
+    "SigmasToIntSeq": SigmasToIntSeq,
     "IntSeqPlotter": IntSeqPlotter,
     "IntSeqWave": IntSeqWave
 }
@@ -433,6 +458,7 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "IntSeqImage": "Integer Sequence Image",
     "IntSeqSigmas": "Integer Sequence Sigmas",
+    "SigmasToIntSeq": "Sigmas to Integer Sequence",
     "IntSeqPlotter": "Integer Sequence Plotter",
     "IntSeqWave": "Integer Sequence Wave"
 }
